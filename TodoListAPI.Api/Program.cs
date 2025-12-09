@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TodoListAPI.Repository;
+using TodoListAPI.Repository.Models;
 using TodoListAPI.Repository.Repositories;
 using TodoListAPI.Services.Services;
 
@@ -28,10 +29,32 @@ builder.Services.AddScoped<IListItemService, ListItemService>();
 var app = builder.Build();
 
 // Ensure database is created and migrations are applied
+// Also create test user if it doesn't exist (for placeholder userId before authentication)
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<TodoListDbContext>();
     dbContext.Database.Migrate();
+    
+    // Create test user for placeholder userId (00000000-0000-0000-0000-000000000001)
+    // This is needed until Task #20 (JWT Authentication) is implemented
+    var testUserId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+    var testUserExists = dbContext.Users.Any(u => u.Id == testUserId);
+    
+    if (!testUserExists)
+    {
+        var testUser = new User
+        {
+            Id = testUserId,
+            Email = "test@example.com",
+            Username = "TestUser",
+            PasswordHash = "PLACEHOLDER_HASH", // Not used until authentication is implemented
+            Role = "User",
+            CreatedDate = DateTime.UtcNow
+        };
+        
+        dbContext.Users.Add(testUser);
+        dbContext.SaveChanges();
+    }
 }
 
 // Configure the HTTP request pipeline.
