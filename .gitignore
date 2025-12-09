@@ -1,0 +1,53 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+*.log
+*.vs/
+.vs/
+
+## Rider
+.idea/
+*.sln.iml
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+
+## SQLite
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+## Environment
+.env
+.env.local
+appsettings.Development.json
+appsettings.Production.json
+
+## Cursor Output (AI-generated files, requirements, etc.)
+.cursor-output/
+*.cursor-output/
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Test Results
+TestResults/
+*.trx
+*.coverage
+
+## Build
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+
