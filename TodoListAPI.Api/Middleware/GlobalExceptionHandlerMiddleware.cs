@@ -119,21 +119,11 @@ public class GlobalExceptionHandlerMiddleware
                 break;
 
             case Microsoft.EntityFrameworkCore.DbUpdateException dbUpdateEx:
-                // Handle database constraint violations
-                if (dbUpdateEx.InnerException?.Message?.Contains("FOREIGN KEY") == true)
-                {
-                    problemDetails.Status = (int)HttpStatusCode.BadRequest;
-                    problemDetails.Title = "Invalid Reference";
-                    problemDetails.Detail = "The operation failed due to a referential integrity constraint.";
-                }
-                else
-                {
-                    problemDetails.Status = (int)HttpStatusCode.InternalServerError;
-                    problemDetails.Title = "Database Error";
-                    problemDetails.Detail = _environment.IsDevelopment() 
-                        ? exception.ToString() 
-                        : "An error occurred while processing your request.";
-                }
+                problemDetails.Status = (int)HttpStatusCode.InternalServerError;
+                problemDetails.Title = "Database Error";
+                problemDetails.Detail = _environment.IsDevelopment() 
+                    ? exception.ToString() 
+                    : "An error occurred while processing your request.";
                 break;
 
             default:
