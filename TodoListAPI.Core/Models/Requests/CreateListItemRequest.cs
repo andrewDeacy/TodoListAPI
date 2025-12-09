@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TodoListAPI.Api.Models.Requests;
+namespace TodoListAPI.Core.Models.Requests;
 
 /// <summary>
 /// Request model for creating a new todo item within a list.

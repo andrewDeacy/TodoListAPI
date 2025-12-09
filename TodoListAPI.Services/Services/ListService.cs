@@ -1,4 +1,5 @@
 using TodoListAPI.Core.DTOs;
+using TodoListAPI.Core.Models.Requests;
 
 namespace TodoListAPI.Services.Services;
 
@@ -44,10 +45,9 @@ public class ListService : IListService
 
     /// <summary>
     /// Creates a new list for a user.
-    /// TODO (Task #5): Change parameter from object to CreateListDto when request models are completed.
     /// TODO (Task #9): Validate request, map request to entity, call _listRepository.CreateAsync(entity), map entity to DTO, return DTO.
     /// </summary>
-    public Task<TodoListDto> CreateListAsync(Guid userId, object request)
+    public Task<TodoListDto> CreateListAsync(Guid userId, CreateListRequest request)
     {
         // TODO (Task #9): Validate request
         // TODO (Task #9): Map request to entity
@@ -59,11 +59,10 @@ public class ListService : IListService
 
     /// <summary>
     /// Updates an existing list.
-    /// TODO (Task #5): Change parameter from object to UpdateListDto when request models are completed.
     /// TODO (Task #9): Get existing entity via _listRepository.GetByIdAsync(id), if not found return false,
     /// update entity properties from request, call _listRepository.UpdateAsync(entity), return true.
     /// </summary>
-    public Task<bool> UpdateListAsync(Guid id, object request)
+    public Task<bool> UpdateListAsync(Guid id, UpdateListRequest request)
     {
         // TODO (Task #9): Get existing entity via _listRepository.GetByIdAsync(id)
         // TODO (Task #9): If not found, return false
@@ -86,11 +85,10 @@ public class ListService : IListService
 
     /// <summary>
     /// Adds an item to a list.
-    /// TODO (Task #5): Change parameter from object to CreateListItemDto when request models are completed.
     /// TODO (Task #9): Validate list exists via _listRepository.GetByIdAsync(listId), map request to entity,
     /// call _listItemRepository.CreateAsync(entity), map entity to DTO, return DTO.
     /// </summary>
-    public Task<TodoItemDto> AddItemAsync(Guid listId, object request)
+    public Task<TodoItemDto> AddItemAsync(Guid listId, CreateListItemRequest request)
     {
         // TODO (Task #9): Validate list exists via _listRepository.GetByIdAsync(listId)
         // TODO (Task #9): Map request to entity
@@ -103,9 +101,8 @@ public class ListService : IListService
     /// <summary>
     /// Removes an item from a list.
     /// TODO (Task #9): Call _listItemRepository.DeleteAsync(itemId), return true if deleted, false if not found.
-    /// TODO (Task #19): Fix method name typo "RemoveItmemAsync" → "RemoveItemAsync".
     /// </summary>
-    public Task<bool> RemoveItmemAsync(Guid listId, Guid itemId)
+    public Task<bool> RemoveItemAsync(Guid listId, Guid itemId)
     {
         // TODO (Task #9): Call _listItemRepository.DeleteAsync(itemId)
         // TODO (Task #9): Return true if deleted, false if not found

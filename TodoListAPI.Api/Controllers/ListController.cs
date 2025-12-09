@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using TodoListAPI.Api.Models.Requests;
 using TodoListAPI.Api.Models.Responses;
 using TodoListAPI.Core.DTOs;
+using TodoListAPI.Core.Models.Requests;
 using TodoListAPI.Services.Services;
 
 namespace TodoListAPI.Api.Controllers;
@@ -107,8 +107,7 @@ public class ListController : ControllerBase
     public async Task<IActionResult> RemoveItemFromList(Guid listId, Guid itemId)
     {
         // TODO (Task #9): Service implementation will be completed in Task #9
-        // TODO (Task #19): Fix typo in service method name "RemoveItmemAsync" → "RemoveItemAsync"
-        var success = await _listService.RemoveItmemAsync(listId, itemId);
+        var success = await _listService.RemoveItemAsync(listId, itemId);
         if (!success) return NotFound();
         return NoContent();
     }

@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- System.ComponentModel.Annotations is included in .NET 8 framework, no package needed -->
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="DTOs" />
   </ItemGroup>
 
