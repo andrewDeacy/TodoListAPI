@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TodoListAPI.Api.Middleware;
 using TodoListAPI.Repository;
 using TodoListAPI.Repository.Models;
 using TodoListAPI.Repository.Repositories;
@@ -7,7 +10,36 @@ using TodoListAPI.Services.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        // Configure ProblemDetails for validation errors
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Validation Error",
+                Detail = "One or more validation errors occurred.",
+                Instance = context.HttpContext.Request.Path
+            };
+
+            // Add validation errors to the response
+            var errors = context.ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+
+            problemDetails.Extensions.Add("errors", errors);
+
+            return new BadRequestObjectResult(problemDetails)
+            {
+                ContentTypes = { "application/problem+json" }
+            };
+        };
+    });
 
 // Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -65,6 +97,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add global exception handling middleware (must be before MapControllers)
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.MapControllers();
 
