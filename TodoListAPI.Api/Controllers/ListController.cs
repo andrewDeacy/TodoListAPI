@@ -122,23 +122,37 @@ public class ListController : ControllerBase
         throw new NotImplementedException("To be implemented in Task #9");
     }
 
-    // TODO (Task #6): Complete these mapping methods when Response models are completed
-    // For now, these are placeholder methods that will map DTOs to Response models
+    /// <summary>
+    /// Maps a TodoListDto to a TodoListResponse.
+    /// Includes mapping of nested TodoItems if present.
+    /// </summary>
     private TodoListResponse MapToResponse(TodoListDto dto)
     {
-        // TODO (Task #6): Map all properties from DTO to Response model
         return new TodoListResponse
         {
-            // Properties will be mapped when Response models are completed in Task #6
+            Id = dto.Id,
+            Name = dto.Name,
+            Description = dto.Description,
+            CreatedDate = dto.CreatedDate,
+            UpdatedDate = dto.UpdatedDate,
+            Items = dto.Items?.Select(MapToItemResponse).ToList() ?? new List<TodoItemResponse>()
         };
     }
 
+    /// <summary>
+    /// Maps a TodoItemDto to a TodoItemResponse.
+    /// </summary>
     private TodoItemResponse MapToItemResponse(TodoItemDto dto)
     {
-        // TODO (Task #6): Map all properties from DTO to Response model
         return new TodoItemResponse
         {
-            // Properties will be mapped when Response models are completed in Task #6
+            Id = dto.Id,
+            Title = dto.Title,
+            Description = dto.Description,
+            IsCompleted = dto.IsCompleted,
+            CreatedDate = dto.CreatedDate,
+            UpdatedDate = dto.UpdatedDate,
+            DueDate = dto.DueDate
         };
     }
 }
