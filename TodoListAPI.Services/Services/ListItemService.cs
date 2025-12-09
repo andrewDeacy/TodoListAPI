@@ -1,97 +1,133 @@
 using TodoListAPI.Core.DTOs;
 using TodoListAPI.Core.Models.Requests;
+using TodoListAPI.Repository.Models;
+using TodoListAPI.Repository.Repositories;
 
 namespace TodoListAPI.Services.Services;
 
 /// <summary>
 /// Service implementation for TodoItem operations.
 /// Uses DTOs for data transfer (never returns entities).
-/// TODO (Task #9): Implement all methods with repository calls and business logic.
 /// </summary>
 public class ListItemService : IListItemService
 {
+    private readonly IListItemRepository _listItemRepository;
+    private readonly IListRepository _listRepository;
+
     /// <summary>
-    /// TODO (Task #13): Inject IListItemRepository via constructor.
+    /// Initializes a new instance of the ListItemService class.
     /// </summary>
-    public ListItemService()
+    /// <param name="listItemRepository">Repository for TodoItem operations.</param>
+    /// <param name="listRepository">Repository for TodoList operations (for validation).</param>
+    public ListItemService(IListItemRepository listItemRepository, IListRepository listRepository)
     {
-        // TODO (Task #13): Add constructor injection for repository
+        _listItemRepository = listItemRepository ?? throw new ArgumentNullException(nameof(listItemRepository));
+        _listRepository = listRepository ?? throw new ArgumentNullException(nameof(listRepository));
     }
 
     /// <summary>
     /// Gets a todo item by its unique identifier.
-    /// TODO (Task #9): Call _listItemRepository.GetByIdAsync(id), map entity to DTO, return DTO.
     /// </summary>
-    public Task<TodoItemDto?> GetByIdAsync(Guid id)
+    public async Task<TodoItemDto?> GetByIdAsync(Guid id)
     {
-        // TODO (Task #9): Call _listItemRepository.GetByIdAsync(id)
-        // TODO (Task #9): Map entity to DTO (or null if not found)
-        // TODO (Task #9): Return DTO
-        throw new NotImplementedException("To be implemented in Task #9");
+        var entity = await _listItemRepository.GetByIdAsync(id);
+        return entity == null ? null : MapToDto(entity);
     }
 
     /// <summary>
     /// Gets all todo items for a specific list.
-    /// TODO (Task #9): Call _listItemRepository.GetByListIdAsync(listId), map entities to DTOs, return DTOs.
     /// </summary>
-    public Task<IEnumerable<TodoItemDto>> GetByListIdAsync(Guid listId)
+    public async Task<IEnumerable<TodoItemDto>> GetByListIdAsync(Guid listId)
     {
-        // TODO (Task #9): Call _listItemRepository.GetByListIdAsync(listId)
-        // TODO (Task #9): Map entities to DTOs
-        // TODO (Task #9): Return DTOs
-        throw new NotImplementedException("To be implemented in Task #9");
+        var entities = await _listItemRepository.GetByListIdAsync(listId);
+        return entities.Select(MapToDto);
     }
 
     /// <summary>
     /// Creates a new todo item.
-    /// TODO (Task #9): Validate list exists, map request to entity, call _listItemRepository.CreateAsync(entity), map entity to DTO, return DTO.
     /// </summary>
-    public Task<TodoItemDto> CreateAsync(Guid listId, CreateListItemRequest request)
+    public async Task<TodoItemDto> CreateAsync(Guid listId, CreateListItemRequest request)
     {
-        // TODO (Task #9): Validate list exists
-        // TODO (Task #9): Map request to entity
-        // TODO (Task #9): Call _listItemRepository.CreateAsync(entity)
-        // TODO (Task #9): Map entity to DTO
-        // TODO (Task #9): Return DTO
-        throw new NotImplementedException("To be implemented in Task #9");
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+
+        // Validate list exists
+        var list = await _listRepository.GetByIdAsync(listId, includeItems: false);
+        if (list == null)
+            throw new InvalidOperationException($"Todo list with ID {listId} not found.");
+
+        // Map request to entity
+        var entity = new TodoItem
+        {
+            Id = Guid.NewGuid(),
+            ListId = listId,
+            Title = request.Title,
+            Description = request.Description,
+            DueDate = request.DueDate,
+            IsCompleted = false,
+            CreatedDate = DateTime.UtcNow,
+            UpdatedDate = DateTime.UtcNow
+        };
+
+        // Create via repository
+        var createdEntity = await _listItemRepository.CreateAsync(entity);
+        return MapToDto(createdEntity);
     }
 
     /// <summary>
     /// Updates an existing todo item.
-    /// TODO (Task #9): Get existing entity via _listItemRepository.GetByIdAsync(id), if not found return null,
-    /// update entity properties from request, call _listItemRepository.UpdateAsync(entity), map to DTO, return DTO.
     /// </summary>
-    public Task<TodoItemDto?> UpdateAsync(Guid id, CreateListItemRequest request)
+    public async Task<TodoItemDto?> UpdateAsync(Guid id, CreateListItemRequest request)
     {
-        // TODO (Task #9): Get existing entity via _listItemRepository.GetByIdAsync(id)
-        // TODO (Task #9): If not found, return null
-        // TODO (Task #9): Update entity properties from request
-        // TODO (Task #9): Call _listItemRepository.UpdateAsync(entity)
-        // TODO (Task #9): Map entity to DTO
-        // TODO (Task #9): Return DTO
-        throw new NotImplementedException("To be implemented in Task #9");
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+
+        var entity = await _listItemRepository.GetByIdAsync(id);
+        if (entity == null)
+            return null;
+
+        // Update entity properties
+        entity.Title = request.Title;
+        entity.Description = request.Description;
+        entity.DueDate = request.DueDate;
+        entity.UpdatedDate = DateTime.UtcNow;
+
+        var updatedEntity = await _listItemRepository.UpdateAsync(entity);
+        return MapToDto(updatedEntity);
     }
 
     /// <summary>
     /// Deletes a todo item.
-    /// TODO (Task #9): Call _listItemRepository.DeleteAsync(id), return true if deleted, false if not found.
     /// </summary>
-    public Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(Guid id)
     {
-        // TODO (Task #9): Call _listItemRepository.DeleteAsync(id)
-        // TODO (Task #9): Return true if deleted, false if not found
-        throw new NotImplementedException("To be implemented in Task #9");
+        return await _listItemRepository.DeleteAsync(id);
     }
 
     /// <summary>
     /// Marks a todo item as completed or not completed.
-    /// TODO (Task #9): Call _listItemRepository.MarkCompleteAsync(id, isCompleted), map entity to DTO, return DTO.
     /// </summary>
-    public Task<TodoItemDto?> MarkCompleteAsync(Guid id, bool isCompleted)
+    public async Task<TodoItemDto?> MarkCompleteAsync(Guid id, bool isCompleted)
     {
-        // TODO (Task #9): Call _listItemRepository.MarkCompleteAsync(id, isCompleted)
-        // TODO (Task #9): Map entity to DTO (or null if not found)
-        // TODO (Task #9): Return DTO
-        throw new NotImplementedException("To be implemented in Task #9");
+        var entity = await _listItemRepository.MarkCompleteAsync(id, isCompleted);
+        return entity == null ? null : MapToDto(entity);
+    }
+
+    /// <summary>
+    /// Maps a TodoItem entity to a TodoItemDto.
+    /// </summary>
+    private TodoItemDto MapToDto(TodoItem entity)
+    {
+        return new TodoItemDto
+        {
+            Id = entity.Id,
+            ListId = entity.ListId,
+            Title = entity.Title,
+            Description = entity.Description,
+            IsCompleted = entity.IsCompleted,
+            CreatedDate = entity.CreatedDate,
+            UpdatedDate = entity.UpdatedDate,
+            DueDate = entity.DueDate
+        };
     }
 }
