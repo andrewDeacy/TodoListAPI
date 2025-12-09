@@ -1,12 +1,11 @@
+using TodoListAPI.Core.DTOs;
+
 namespace TodoListAPI.Services.Services;
 
 /// <summary>
 /// Service implementation for TodoList operations.
-/// TODO (Task #4): Replace object types with proper DTOs from Core/DTOs.
+/// Uses DTOs for data transfer (never returns entities).
 /// TODO (Task #9): Implement all methods with repository calls and business logic.
-/// 
-/// NOTE: Currently using object as placeholder. In Task #4, DTOs will be created in Core/DTOs,
-/// and these method signatures will be updated to use proper DTO types instead of object.
 /// </summary>
 public class ListService : IListService
 {
@@ -21,10 +20,9 @@ public class ListService : IListService
 
     /// <summary>
     /// Gets all lists for a specific user.
-    /// TODO (Task #4): Change return type from object to TodoListDto.
     /// TODO (Task #9): Call _listRepository.GetAllForUserAsync(userId), map entities to DTOs, return DTOs.
     /// </summary>
-    public Task<IEnumerable<object>> GetListsForUserAsync(Guid userId)
+    public Task<IEnumerable<TodoListDto>> GetListsForUserAsync(Guid userId)
     {
         // TODO (Task #9): Call _listRepository.GetAllForUserAsync(userId)
         // TODO (Task #9): Map entities to DTOs
@@ -34,10 +32,9 @@ public class ListService : IListService
 
     /// <summary>
     /// Gets a list by ID.
-    /// TODO (Task #4): Change return type from object? to TodoListDto?.
     /// TODO (Task #9): Call _listRepository.GetByIdAsync(id), map entity to DTO (or null if not found), return DTO.
     /// </summary>
-    public Task<object?> GetListByIdAsync(Guid id)
+    public Task<TodoListDto?> GetListByIdAsync(Guid id)
     {
         // TODO (Task #9): Call _listRepository.GetByIdAsync(id)
         // TODO (Task #9): Map entity to DTO (or null if not found)
@@ -47,10 +44,10 @@ public class ListService : IListService
 
     /// <summary>
     /// Creates a new list for a user.
-    /// TODO (Task #4): Change parameter from object to CreateListDto, return type to TodoListDto.
+    /// TODO (Task #5): Change parameter from object to CreateListDto when request models are completed.
     /// TODO (Task #9): Validate request, map request to entity, call _listRepository.CreateAsync(entity), map entity to DTO, return DTO.
     /// </summary>
-    public Task<object> CreateListAsync(Guid userId, object request)
+    public Task<TodoListDto> CreateListAsync(Guid userId, object request)
     {
         // TODO (Task #9): Validate request
         // TODO (Task #9): Map request to entity
@@ -62,7 +59,7 @@ public class ListService : IListService
 
     /// <summary>
     /// Updates an existing list.
-    /// TODO (Task #4): Change parameter from object to UpdateListDto.
+    /// TODO (Task #5): Change parameter from object to UpdateListDto when request models are completed.
     /// TODO (Task #9): Get existing entity via _listRepository.GetByIdAsync(id), if not found return false,
     /// update entity properties from request, call _listRepository.UpdateAsync(entity), return true.
     /// </summary>
@@ -89,11 +86,11 @@ public class ListService : IListService
 
     /// <summary>
     /// Adds an item to a list.
-    /// TODO (Task #4): Change parameter from object to CreateListItemDto, return type to TodoItemDto.
+    /// TODO (Task #5): Change parameter from object to CreateListItemDto when request models are completed.
     /// TODO (Task #9): Validate list exists via _listRepository.GetByIdAsync(listId), map request to entity,
     /// call _listItemRepository.CreateAsync(entity), map entity to DTO, return DTO.
     /// </summary>
-    public Task<object> AddItemAsync(Guid listId, object request)
+    public Task<TodoItemDto> AddItemAsync(Guid listId, object request)
     {
         // TODO (Task #9): Validate list exists via _listRepository.GetByIdAsync(listId)
         // TODO (Task #9): Map request to entity

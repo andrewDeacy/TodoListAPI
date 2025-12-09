@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TodoListAPI.Api.Models.Requests;
 using TodoListAPI.Api.Models.Responses;
+using TodoListAPI.Core.DTOs;
 using TodoListAPI.Services.Services;
 
 namespace TodoListAPI.Api.Controllers;
@@ -23,21 +24,24 @@ public class ListController : ControllerBase
         // For now, use placeholder userId as specified in Backend-Todo-List.md Task #10
         var userId = Guid.Parse("00000000-0000-0000-0000-000000000001");
         
-        // TODO (Task #4, #9): Service will return DTOs in Task #4, implementation in Task #9
-        // For now, service returns object - will be properly typed in Task #4
+        // TODO (Task #9): Service implementation will be completed in Task #9
         var lists = await _listService.GetListsForUserAsync(userId);
-        return Ok(lists.Cast<TodoListResponse>());
+        
+        // TODO (Task #6): Map DTOs to Response models when Response models are completed
+        // For now, return DTOs directly (will be mapped in Task #6)
+        return Ok(lists.Select(MapToResponse));
     }
 
     // GET /api/lists/{id}
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<TodoListResponse>> GetListById(Guid id)
     {
-        // TODO (Task #4, #9): Service will return DTOs in Task #4, implementation in Task #9
-        // For now, service returns object? - will be properly typed in Task #4
+        // TODO (Task #9): Service implementation will be completed in Task #9
         var list = await _listService.GetListByIdAsync(id);
         if (list == null) return NotFound();
-        return Ok((TodoListResponse)list);
+        
+        // TODO (Task #6): Map DTO to Response model when Response models are completed
+        return Ok(MapToResponse(list));
     }
 
     // POST /api/lists
@@ -48,16 +52,15 @@ public class ListController : ControllerBase
         // For now, use placeholder userId as specified in Backend-Todo-List.md Task #10
         var userId = Guid.Parse("00000000-0000-0000-0000-000000000001");
         
-        // TODO (Task #4, #9): Service will accept/return DTOs in Task #4, implementation in Task #9
-        // For now, service uses object - will be properly typed in Task #4
+        // TODO (Task #9): Service implementation will be completed in Task #9
         var created = await _listService.CreateListAsync(userId, request);
-        var response = (TodoListResponse)created;
+        var response = MapToResponse(created);
         
-        // TODO (Task #6): TodoListResponse.Id will be added in Task #6
-        // For now, use Guid.Empty as placeholder
+        // TODO (Task #6): Use response.Id when Response models are completed
+        // For now, use DTO's Id property
         return CreatedAtAction(
             nameof(GetListById),
-            new { id = Guid.Empty },
+            new { id = created.Id },
             response);
     }
 
@@ -87,16 +90,15 @@ public class ListController : ControllerBase
         Guid listId,
         CreateListItemRequest request)
     {
-        // TODO (Task #4, #9): Service will accept/return DTOs in Task #4, implementation in Task #9
-        // For now, service uses object - will be properly typed in Task #4
+        // TODO (Task #9): Service implementation will be completed in Task #9
         var created = await _listService.AddItemAsync(listId, request);
-        var response = (TodoItemResponse)created;
+        var response = MapToItemResponse(created);
         
-        // TODO (Task #6): TodoItemResponse.Id will be added in Task #6
-        // For now, use Guid.Empty as placeholder
+        // TODO (Task #6): Use response.Id when Response models are completed
+        // For now, use DTO's Id property
         return CreatedAtAction(
             nameof(GetListItemById),
-            new { listId, itemId = Guid.Empty },
+            new { listId, itemId = created.Id },
             response);
     }
 
@@ -118,5 +120,25 @@ public class ListController : ControllerBase
         // TODO (Task #9): Add GetItemByIdAsync method to IListService and implement
         // For now, this endpoint is not fully implemented
         throw new NotImplementedException("To be implemented in Task #9");
+    }
+
+    // TODO (Task #6): Complete these mapping methods when Response models are completed
+    // For now, these are placeholder methods that will map DTOs to Response models
+    private TodoListResponse MapToResponse(TodoListDto dto)
+    {
+        // TODO (Task #6): Map all properties from DTO to Response model
+        return new TodoListResponse
+        {
+            // Properties will be mapped when Response models are completed in Task #6
+        };
+    }
+
+    private TodoItemResponse MapToItemResponse(TodoItemDto dto)
+    {
+        // TODO (Task #6): Map all properties from DTO to Response model
+        return new TodoItemResponse
+        {
+            // Properties will be mapped when Response models are completed in Task #6
+        };
     }
 }

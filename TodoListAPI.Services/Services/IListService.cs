@@ -1,40 +1,36 @@
+using TodoListAPI.Core.DTOs;
+
 namespace TodoListAPI.Services.Services;
 
 /// <summary>
 /// Service interface for TodoList operations.
-/// TODO (Task #4): Replace object types with proper DTOs from Core/DTOs.
-/// TODO (Task #8): Complete interface definition with proper DTOs (not entities).
+/// Uses DTOs for data transfer between layers (never returns entities).
 /// TODO (Task #9): Implement all methods in ListService.
-/// 
-/// NOTE: Currently using object as placeholder. In Task #4, DTOs will be created in Core/DTOs,
-/// and these method signatures will be updated to use proper DTO types instead of object.
 /// </summary>
 public interface IListService
 {
     /// <summary>
     /// Gets all lists for a specific user.
-    /// TODO (Task #4): Change return type from object to TodoListDto.
     /// TODO (Task #9): Implement with repository calls, map entities to DTOs.
     /// </summary>
-    Task<IEnumerable<object>> GetListsForUserAsync(Guid userId);
+    Task<IEnumerable<TodoListDto>> GetListsForUserAsync(Guid userId);
 
     /// <summary>
     /// Gets a list by ID.
-    /// TODO (Task #4): Change return type from object? to TodoListDto?.
     /// TODO (Task #9): Implement with repository call, map entity to DTO.
     /// </summary>
-    Task<object?> GetListByIdAsync(Guid id);
+    Task<TodoListDto?> GetListByIdAsync(Guid id);
 
     /// <summary>
     /// Creates a new list for a user.
-    /// TODO (Task #4): Change parameter from object to CreateListDto, return type to TodoListDto.
+    /// TODO (Task #5): Change parameter from object to CreateListDto when request models are completed.
     /// TODO (Task #9): Implement with repository call, map request to entity, save, return DTO.
     /// </summary>
-    Task<object> CreateListAsync(Guid userId, object request);
+    Task<TodoListDto> CreateListAsync(Guid userId, object request);
 
     /// <summary>
     /// Updates an existing list.
-    /// TODO (Task #4): Change parameter from object to UpdateListDto.
+    /// TODO (Task #5): Change parameter from object to UpdateListDto when request models are completed.
     /// TODO (Task #9): Implement with repository call, update entity, return success.
     /// </summary>
     Task<bool> UpdateListAsync(Guid id, object request);
@@ -47,10 +43,10 @@ public interface IListService
 
     /// <summary>
     /// Adds an item to a list.
-    /// TODO (Task #4): Change parameter from object to CreateListItemDto, return type to TodoItemDto.
+    /// TODO (Task #5): Change parameter from object to CreateListItemDto when request models are completed.
     /// TODO (Task #9): Implement with repository call, map request to entity, save, return DTO.
     /// </summary>
-    Task<object> AddItemAsync(Guid listId, object request);
+    Task<TodoItemDto> AddItemAsync(Guid listId, object request);
 
     /// <summary>
     /// Removes an item from a list.
