@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListAPI.Services", "Tod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListAPI.Repository", "TodoListAPI.Repository\TodoListAPI.Repository.csproj", "{F0A7633C-5765-4618-A1E1-60C15522BF6B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListAPI.Tests", "TodoListAPI.Tests\TodoListAPI.Tests.csproj", "{CD24EDA1-684C-4945-9930-D68B53DEC54A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,5 +33,9 @@ Global
 		{F0A7633C-5765-4618-A1E1-60C15522BF6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0A7633C-5765-4618-A1E1-60C15522BF6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0A7633C-5765-4618-A1E1-60C15522BF6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD24EDA1-684C-4945-9930-D68B53DEC54A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD24EDA1-684C-4945-9930-D68B53DEC54A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD24EDA1-684C-4945-9930-D68B53DEC54A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD24EDA1-684C-4945-9930-D68B53DEC54A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
