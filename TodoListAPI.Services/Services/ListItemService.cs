@@ -114,6 +114,26 @@ public class ListItemService : IListItemService
     }
 
     /// <summary>
+    /// Reorders todo items within a list by updating their Order values.
+    /// </summary>
+    public async Task<bool> ReorderItemsAsync(Guid listId, ReorderItemsRequest request)
+    {
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+
+        if (request.ItemOrders == null || request.ItemOrders.Count == 0)
+            return true; // Nothing to reorder
+
+        // Validate list exists
+        var list = await _listRepository.GetByIdAsync(listId, includeItems: false);
+        if (list == null)
+            throw new InvalidOperationException($"Todo list with ID {listId} not found.");
+
+        // Call repository method to perform reordering
+        return await _listItemRepository.ReorderItemsAsync(listId, request.ItemOrders);
+    }
+
+    /// <summary>
     /// Maps a TodoItem entity to a TodoItemDto.
     /// </summary>
     private TodoItemDto MapToDto(TodoItem entity)
@@ -127,7 +147,8 @@ public class ListItemService : IListItemService
             IsCompleted = entity.IsCompleted,
             CreatedDate = entity.CreatedDate,
             UpdatedDate = entity.UpdatedDate,
-            DueDate = entity.DueDate
+            DueDate = entity.DueDate,
+            Order = entity.Order
         };
     }
 }

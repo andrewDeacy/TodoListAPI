@@ -47,5 +47,12 @@ public class TodoItemDto
     /// Null if no due date is set.
     /// </summary>
     public DateTime? DueDate { get; set; }
+
+    /// <summary>
+    /// Order/position of the todo item within its list.
+    /// Used for custom ordering and reordering functionality.
+    /// Lower values appear first in the list.
+    /// </summary>
+    public int Order { get; set; }
 }
 

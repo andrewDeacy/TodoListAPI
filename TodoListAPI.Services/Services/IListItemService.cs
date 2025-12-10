@@ -54,4 +54,12 @@ public interface IListItemService
     /// <param name="isCompleted">True to mark as completed, false to mark as not completed.</param>
     /// <returns>The updated TodoItemDto if found, null otherwise.</returns>
     Task<TodoItemDto?> MarkCompleteAsync(Guid id, bool isCompleted);
+
+    /// <summary>
+    /// Reorders todo items within a list by updating their Order values.
+    /// </summary>
+    /// <param name="listId">The unique identifier of the todo list.</param>
+    /// <param name="request">The request containing item ID to order position mappings.</param>
+    /// <returns>True if reordering was successful, false if validation failed.</returns>
+    Task<bool> ReorderItemsAsync(Guid listId, ReorderItemsRequest request);
 }
