@@ -50,5 +50,13 @@ public interface IListItemRepository
     /// <param name="isCompleted">True to mark as completed, false to mark as not completed.</param>
     /// <returns>The updated TodoItem entity if found, null otherwise.</returns>
     Task<TodoItem?> MarkCompleteAsync(Guid id, bool isCompleted);
+
+    /// <summary>
+    /// Reorders todo items within a list by updating their Order values.
+    /// </summary>
+    /// <param name="listId">The unique identifier of the todo list.</param>
+    /// <param name="itemOrders">Dictionary mapping item IDs to their new order positions.</param>
+    /// <returns>True if reordering was successful, false if any items don't belong to the list.</returns>
+    Task<bool> ReorderItemsAsync(Guid listId, Dictionary<Guid, int> itemOrders);
 }
 

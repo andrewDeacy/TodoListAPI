@@ -31,13 +31,13 @@ public class ListItemRepository : IListItemRepository
     }
 
     /// <summary>
-    /// Gets all todo items for a specific list.
+    /// Gets all todo items for a specific list, ordered by their Order property.
     /// </summary>
     public async Task<IEnumerable<TodoItem>> GetByListIdAsync(Guid listId)
     {
         return await _context.TodoItems
             .Where(ti => ti.ListId == listId)
-            .OrderBy(ti => ti.CreatedDate)
+            .OrderBy(ti => ti.Order)
             .ToListAsync();
     }
 
@@ -58,6 +58,15 @@ public class ListItemRepository : IListItemRepository
         {
             todoItem.Id = Guid.NewGuid();
         }
+
+        // Assign order automatically: get max order for the list and add 1
+        // If list is empty, order will be 0
+        var maxOrder = await _context.TodoItems
+            .Where(ti => ti.ListId == todoItem.ListId)
+            .Select(ti => (int?)ti.Order)
+            .MaxAsync();
+
+        todoItem.Order = (maxOrder ?? -1) + 1; // If maxOrder is null, start at 0
 
         _context.TodoItems.Add(todoItem);
         await _context.SaveChangesAsync();
@@ -112,6 +121,41 @@ public class ListItemRepository : IListItemRepository
         await _context.SaveChangesAsync();
 
         return todoItem;
+    }
+
+    /// <summary>
+    /// Reorders todo items within a list by updating their Order values.
+    /// </summary>
+    public async Task<bool> ReorderItemsAsync(Guid listId, Dictionary<Guid, int> itemOrders)
+    {
+        if (itemOrders == null || itemOrders.Count == 0)
+            return true; // Nothing to reorder
+
+        // Validate all items belong to the specified list
+        var itemIds = itemOrders.Keys.ToList();
+        var items = await _context.TodoItems
+            .Where(ti => itemIds.Contains(ti.Id))
+            .ToListAsync();
+
+        // Check if all items exist and belong to the list
+        if (items.Count != itemIds.Count)
+            return false; // Some items not found
+
+        if (items.Any(ti => ti.ListId != listId))
+            return false; // Some items don't belong to the list
+
+        // Update order values
+        foreach (var item in items)
+        {
+            if (itemOrders.TryGetValue(item.Id, out var newOrder))
+            {
+                item.Order = newOrder;
+                item.UpdatedDate = DateTime.UtcNow;
+            }
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 }
 
