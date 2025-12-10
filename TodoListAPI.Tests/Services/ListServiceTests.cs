@@ -29,7 +29,7 @@ public class ListServiceTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        _mockListRepository.Setup(r => r.GetAllForUserAsync(userId, false))
+        _mockListRepository.Setup(r => r.GetAllForUserAsync(userId, true))
             .ReturnsAsync(new List<TodoList>());
 
         // Act
@@ -38,7 +38,7 @@ public class ListServiceTests
         // Assert
         Assert.IsNotNull(result);
         Assert.AreEqual(0, result.Count());
-        _mockListRepository.Verify(r => r.GetAllForUserAsync(userId, false), Times.Once);
+        _mockListRepository.Verify(r => r.GetAllForUserAsync(userId, true), Times.Once);
     }
 
     [TestMethod]
@@ -70,7 +70,7 @@ public class ListServiceTests
             }
         };
 
-        _mockListRepository.Setup(r => r.GetAllForUserAsync(userId, false))
+        _mockListRepository.Setup(r => r.GetAllForUserAsync(userId, true))
             .ReturnsAsync(lists);
 
         // Act

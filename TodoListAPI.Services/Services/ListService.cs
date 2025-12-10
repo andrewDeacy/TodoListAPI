@@ -30,7 +30,7 @@ public class ListService : IListService
     /// </summary>
     public async Task<IEnumerable<TodoListDto>> GetListsForUserAsync(Guid userId)
     {
-        var entities = await _listRepository.GetAllForUserAsync(userId, includeItems: false);
+        var entities = await _listRepository.GetAllForUserAsync(userId, includeItems: true);
         return entities.Select(MapToDto);
     }
 
