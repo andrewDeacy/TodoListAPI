@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -26,9 +26,10 @@ namespace TodoListAPI.Repository.Migrations
             // Initialize existing items with order based on CreatedDate within each list
             // This SQL assigns sequential order (0, 1, 2, ...) to items within each list,
             // ordered by CreatedDate (oldest first)
+            // Note: "Order" is a reserved keyword in SQLite, so it must be escaped with double quotes
             migrationBuilder.Sql(@"
                 UPDATE TodoItems
-                SET Order = (
+                SET ""Order"" = (
                     SELECT COUNT(*)
                     FROM TodoItems AS t2
                     WHERE t2.ListId = TodoItems.ListId
