@@ -76,8 +76,8 @@ public class ListController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<TodoListResponse>> CreateList(CreateListRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        // Validation is automatically handled by [ApiController] attribute
+        // Invalid requests return ProblemDetails (RFC 7807) before this method is called
 
         // TODO (Task #20): Extract userId from JWT claims when authentication is implemented
         // For now, use placeholder userId as specified in Backend-Todo-List.md Task #10
@@ -114,8 +114,8 @@ public class ListController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateList(Guid id, UpdateListRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        // Validation is automatically handled by [ApiController] attribute
+        // Invalid requests return ProblemDetails (RFC 7807) before this method is called
 
         var success = await _listService.UpdateListAsync(id, request);
         if (!success) 
@@ -158,8 +158,8 @@ public class ListController : ControllerBase
         Guid listId,
         CreateListItemRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        // Validation is automatically handled by [ApiController] attribute
+        // Invalid requests return ProblemDetails (RFC 7807) before this method is called
 
         try
         {

@@ -77,8 +77,8 @@ public class ListItemController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<TodoItemResponse>> CreateItem(Guid listId, CreateListItemRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        // Validation is automatically handled by [ApiController] attribute
+        // Invalid requests return ProblemDetails (RFC 7807) before this method is called
 
         try
         {
@@ -115,8 +115,8 @@ public class ListItemController : ControllerBase
         Guid itemId, 
         CreateListItemRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        // Validation is automatically handled by [ApiController] attribute
+        // Invalid requests return ProblemDetails (RFC 7807) before this method is called
 
         // Validate item belongs to list
         var existingItem = await _listItemService.GetByIdAsync(itemId);
