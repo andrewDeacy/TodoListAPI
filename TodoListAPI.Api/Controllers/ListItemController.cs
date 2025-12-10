@@ -201,6 +201,51 @@ public class ListItemController : ControllerBase
     }
 
     /// <summary>
+    /// Reorders todo items within a list by updating their Order values.
+    /// </summary>
+    /// <param name="listId">The unique identifier of the todo list.</param>
+    /// <param name="request">The request containing item ID to order position mappings.</param>
+    /// <returns>No content if successful.</returns>
+    /// <response code="204">If the items were reordered successfully.</response>
+    /// <response code="400">If the request is invalid, the list does not exist, or items don't belong to the list.</response>
+    /// <remarks>
+    /// This endpoint allows reordering items within a list. The request contains a dictionary mapping item IDs to their new order positions.
+    /// Lower order values appear first in the list. Items can be reordered to any position, and gaps are allowed for efficiency.
+    /// 
+    /// Example request:
+    /// {
+    ///   "itemOrders": {
+    ///     "item-id-1": 0,
+    ///     "item-id-2": 1,
+    ///     "item-id-3": 2
+    ///   }
+    /// }
+    /// </remarks>
+    [HttpPatch("reorder")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ReorderItems(Guid listId, ReorderItemsRequest request)
+    {
+        // Validation is automatically handled by [ApiController] attribute
+        // Invalid requests return ProblemDetails (RFC 7807) before this method is called
+
+        try
+        {
+            var success = await _listItemService.ReorderItemsAsync(listId, request);
+            if (!success)
+            {
+                return BadRequest(new { error = "Reordering failed. Ensure all items belong to the specified list." });
+            }
+
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
     /// Maps a TodoItemDto to a TodoItemResponse.
     /// </summary>
     private TodoItemResponse MapToResponse(TodoListAPI.Core.DTOs.TodoItemDto dto)
@@ -213,7 +258,8 @@ public class ListItemController : ControllerBase
             IsCompleted = dto.IsCompleted,
             CreatedDate = dto.CreatedDate,
             UpdatedDate = dto.UpdatedDate,
-            DueDate = dto.DueDate
+            DueDate = dto.DueDate,
+            Order = dto.Order
         };
     }
 }

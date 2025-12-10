@@ -455,5 +455,187 @@ public class ListItemServiceTests
     }
 
     #endregion
+
+    #region ReorderItemsAsync Tests
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public async Task ReorderItemsAsync_ThrowsArgumentNullException_WhenRequestIsNull()
+    {
+        // Arrange
+        var listId = Guid.NewGuid();
+
+        // Act
+        await _listItemService.ReorderItemsAsync(listId, null!);
+
+        // Assert - Exception expected
+    }
+
+    [TestMethod]
+    public async Task ReorderItemsAsync_ReturnsTrue_WhenRequestIsEmpty()
+    {
+        // Arrange
+        var listId = Guid.NewGuid();
+        var request = new ReorderItemsRequest
+        {
+            ItemOrders = new Dictionary<Guid, int>()
+        };
+
+        // Act
+        var result = await _listItemService.ReorderItemsAsync(listId, request);
+
+        // Assert
+        Assert.IsTrue(result);
+        // When request is empty, service returns early without checking list or calling repository
+        _mockListRepository.Verify(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Never);
+        _mockListItemRepository.Verify(r => r.ReorderItemsAsync(It.IsAny<Guid>(), It.IsAny<Dictionary<Guid, int>>()), Times.Never);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public async Task ReorderItemsAsync_ThrowsInvalidOperationException_WhenListNotFound()
+    {
+        // Arrange
+        var listId = Guid.NewGuid();
+        var request = new ReorderItemsRequest
+        {
+            ItemOrders = new Dictionary<Guid, int>
+            {
+                { Guid.NewGuid(), 0 }
+            }
+        };
+
+        _mockListRepository.Setup(r => r.GetByIdAsync(listId, false))
+            .ReturnsAsync((TodoList?)null);
+
+        // Act
+        await _listItemService.ReorderItemsAsync(listId, request);
+
+        // Assert - Exception expected
+    }
+
+    [TestMethod]
+    public async Task ReorderItemsAsync_ReturnsTrue_WhenReorderingSucceeds()
+    {
+        // Arrange
+        var listId = Guid.NewGuid();
+        var itemId1 = Guid.NewGuid();
+        var itemId2 = Guid.NewGuid();
+        var itemId3 = Guid.NewGuid();
+
+        var list = new TodoList
+        {
+            Id = listId,
+            Name = "Test List",
+            UserId = Guid.NewGuid(),
+            IsCompleted = false,
+            CreatedDate = DateTime.UtcNow,
+            UpdatedDate = DateTime.UtcNow
+        };
+
+        var request = new ReorderItemsRequest
+        {
+            ItemOrders = new Dictionary<Guid, int>
+            {
+                { itemId1, 2 },
+                { itemId2, 0 },
+                { itemId3, 1 }
+            }
+        };
+
+        _mockListRepository.Setup(r => r.GetByIdAsync(listId, false))
+            .ReturnsAsync(list);
+        _mockListItemRepository.Setup(r => r.ReorderItemsAsync(listId, request.ItemOrders))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _listItemService.ReorderItemsAsync(listId, request);
+
+        // Assert
+        Assert.IsTrue(result);
+        _mockListRepository.Verify(r => r.GetByIdAsync(listId, false), Times.Once);
+        _mockListItemRepository.Verify(r => r.ReorderItemsAsync(listId, request.ItemOrders), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task ReorderItemsAsync_ReturnsFalse_WhenRepositoryValidationFails()
+    {
+        // Arrange
+        var listId = Guid.NewGuid();
+        var itemId1 = Guid.NewGuid();
+        var itemId2 = Guid.NewGuid();
+
+        var list = new TodoList
+        {
+            Id = listId,
+            Name = "Test List",
+            UserId = Guid.NewGuid(),
+            IsCompleted = false,
+            CreatedDate = DateTime.UtcNow,
+            UpdatedDate = DateTime.UtcNow
+        };
+
+        var request = new ReorderItemsRequest
+        {
+            ItemOrders = new Dictionary<Guid, int>
+            {
+                { itemId1, 0 },
+                { itemId2, 1 }
+            }
+        };
+
+        _mockListRepository.Setup(r => r.GetByIdAsync(listId, false))
+            .ReturnsAsync(list);
+        _mockListItemRepository.Setup(r => r.ReorderItemsAsync(listId, request.ItemOrders))
+            .ReturnsAsync(false); // Repository validation fails (items don't belong to list)
+
+        // Act
+        var result = await _listItemService.ReorderItemsAsync(listId, request);
+
+        // Assert
+        Assert.IsFalse(result);
+        _mockListRepository.Verify(r => r.GetByIdAsync(listId, false), Times.Once);
+        _mockListItemRepository.Verify(r => r.ReorderItemsAsync(listId, request.ItemOrders), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task ReorderItemsAsync_HandlesSingleItemReorder()
+    {
+        // Arrange
+        var listId = Guid.NewGuid();
+        var itemId = Guid.NewGuid();
+
+        var list = new TodoList
+        {
+            Id = listId,
+            Name = "Test List",
+            UserId = Guid.NewGuid(),
+            IsCompleted = false,
+            CreatedDate = DateTime.UtcNow,
+            UpdatedDate = DateTime.UtcNow
+        };
+
+        var request = new ReorderItemsRequest
+        {
+            ItemOrders = new Dictionary<Guid, int>
+            {
+                { itemId, 0 }
+            }
+        };
+
+        _mockListRepository.Setup(r => r.GetByIdAsync(listId, false))
+            .ReturnsAsync(list);
+        _mockListItemRepository.Setup(r => r.ReorderItemsAsync(listId, request.ItemOrders))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _listItemService.ReorderItemsAsync(listId, request);
+
+        // Assert
+        Assert.IsTrue(result);
+        _mockListItemRepository.Verify(r => r.ReorderItemsAsync(listId, request.ItemOrders), Times.Once);
+    }
+
+    #endregion
 }
 

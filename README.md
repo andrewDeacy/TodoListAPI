@@ -21,11 +21,12 @@ A production-quality RESTful API for managing todo lists and todo items. Built w
 - ✅ **JWT Authentication** - Secure user registration and login
 - ✅ **Todo List Management** - Create, read, update, and delete todo lists
 - ✅ **Todo Item Management** - Add, update, delete, and mark items as complete
+- ✅ **Item Reordering** - Reorder todo items within lists via drag-and-drop or explicit positioning
 - ✅ **User Isolation** - Each user can only access their own lists and items
 - ✅ **Input Validation** - Comprehensive validation on all request models
 - ✅ **Global Error Handling** - Consistent error responses (RFC 7807 ProblemDetails)
 - ✅ **Swagger Documentation** - Interactive API documentation with JWT support
-- ✅ **Unit Tests** - 48 comprehensive unit tests covering service layer
+- ✅ **Unit Tests** - 54 comprehensive unit tests covering service layer
 - ✅ **Clean Architecture** - Separation of concerns with Repository and Service layers
 
 ## Prerequisites
@@ -177,6 +178,21 @@ curl -X GET "http://localhost:5074/api/List" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
 ```
 
+#### 5. Reorder Items in a List (with JWT token)
+
+```bash
+curl -X PATCH "http://localhost:5074/api/lists/{listId}/items/reorder" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
+  -d '{
+    "itemOrders": {
+      "item-id-1": 0,
+      "item-id-2": 1,
+      "item-id-3": 2
+    }
+  }'
+```
+
 ### Running Unit Tests
 
 ```bash
@@ -222,14 +238,40 @@ Authorization: Bearer <your-jwt-token>
 
 #### Todo Items
 
-- `GET /api/lists/{listId}/items` - Get all items for a specific list
+- `GET /api/lists/{listId}/items` - Get all items for a specific list (ordered by Order property)
 - `GET /api/lists/{listId}/items/{itemId}` - Get a specific item
-- `POST /api/lists/{listId}/items` - Add an item to a list
+- `POST /api/lists/{listId}/items` - Add an item to a list (automatically assigned to end)
 - `PUT /api/lists/{listId}/items/{itemId}` - Update an item
 - `DELETE /api/lists/{listId}/items/{itemId}` - Delete an item
 - `PATCH /api/lists/{listId}/items/{itemId}/complete` - Mark item as complete/incomplete
+- `PATCH /api/lists/{listId}/items/reorder` - Reorder items within a list
 
 For detailed API documentation with request/response examples, see the **Swagger UI** at `/swagger` when the application is running.
+
+### Reordering Items
+
+The reordering feature allows you to change the order of items within a todo list. Items are returned in order based on their `Order` property (lower values appear first).
+
+**Endpoint**: `PATCH /api/lists/{listId}/items/reorder`
+
+**Request Body**:
+```json
+{
+  "itemOrders": {
+    "item-id-1": 0,
+    "item-id-2": 1,
+    "item-id-3": 2
+  }
+}
+```
+
+**Response**: `204 No Content` on success, `400 Bad Request` on validation failure
+
+**Notes**:
+- New items are automatically assigned to the end of the list (max Order + 1)
+- Items are ordered by their `Order` property when retrieved
+- Gaps in order values are allowed for efficiency
+- All items in the request must belong to the specified list
 
 ## Project Structure
 
@@ -414,6 +456,11 @@ If given more time, the following features would be implemented:
 5. **Rate Limiting**
    - Protect against abuse
    - Per-user and per-endpoint limits
+
+6. **Enhanced Reordering**
+   - Fractional ordering for more efficient reordering
+   - Batch reordering operations
+   - Reorder history/undo functionality
 
 ### Medium Priority
 
