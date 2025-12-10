@@ -1,6 +1,263 @@
-@TodoListAPI.Api_HostAddress = http://localhost:5074
+### TodoList API - HTTP Request Collection
+### This file contains examples for all API endpoints
+### Base URL: http://localhost:5074 (Development)
+### Note: Currently uses placeholder userId. JWT authentication will be added in Task #20.
 
-GET {{TodoListAPI.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+@baseUrl = http://localhost:5074
+@contentType = application/json
+
+### Variables (update these after creating resources)
+@listId = 00000000-0000-0000-0000-000000000000
+@itemId = 00000000-0000-0000-0000-000000000000
+
+###############################################
+# TodoList Endpoints
+###############################################
+
+### Get all todo lists for current user
+GET {{baseUrl}}/api/List
+Accept: {{contentType}}
+
+###
+
+### Get a specific todo list by ID
+GET {{baseUrl}}/api/List/{{listId}}
+Accept: {{contentType}}
+
+###
+
+### Create a new todo list
+POST {{baseUrl}}/api/List
+Content-Type: {{contentType}}
+
+{
+  "name": "My Todo List",
+  "description": "A list of tasks I need to complete"
+}
+
+###
+
+### Create a todo list (minimal - no description)
+POST {{baseUrl}}/api/List
+Content-Type: {{contentType}}
+
+{
+  "name": "Shopping List"
+}
+
+###
+
+### Update an existing todo list
+PUT {{baseUrl}}/api/List/{{listId}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Updated Todo List Name",
+  "description": "Updated description"
+}
+
+###
+
+### Delete a todo list
+DELETE {{baseUrl}}/api/List/{{listId}}
+Accept: {{contentType}}
+
+###
+
+###############################################
+# TodoItem Endpoints (via ListController)
+###############################################
+
+### Add a new item to a todo list
+POST {{baseUrl}}/api/List/{{listId}}/items
+Content-Type: {{contentType}}
+
+{
+  "title": "Complete project documentation",
+  "description": "Write comprehensive README and API documentation",
+  "dueDate": "2024-12-31T23:59:59Z"
+}
+
+###
+
+### Add a todo item (minimal - no description or due date)
+POST {{baseUrl}}/api/List/{{listId}}/items
+Content-Type: {{contentType}}
+
+{
+  "title": "Buy groceries"
+}
+
+###
+
+### Get a specific item from a list
+GET {{baseUrl}}/api/List/{{listId}}/items/{{itemId}}
+Accept: {{contentType}}
+
+###
+
+### Remove an item from a todo list
+DELETE {{baseUrl}}/api/List/{{listId}}/items/{{itemId}}
+Accept: {{contentType}}
+
+###
+
+###############################################
+# TodoItem Endpoints (via ListItemController)
+###############################################
+
+### Get all items for a specific list
+GET {{baseUrl}}/api/lists/{{listId}}/items
+Accept: {{contentType}}
+
+###
+
+### Get a specific todo item by ID
+GET {{baseUrl}}/api/lists/{{listId}}/items/{{itemId}}
+Accept: {{contentType}}
+
+###
+
+### Create a new todo item in a list
+POST {{baseUrl}}/api/lists/{{listId}}/items
+Content-Type: {{contentType}}
+
+{
+  "title": "Review code changes",
+  "description": "Review pull request #123",
+  "dueDate": "2024-12-25T10:00:00Z"
+}
+
+###
+
+### Create a todo item (with all optional fields)
+POST {{baseUrl}}/api/lists/{{listId}}/items
+Content-Type: {{contentType}}
+
+{
+  "title": "Deploy to production",
+  "description": "Deploy version 1.0.0 to production environment after final testing",
+  "dueDate": "2024-12-30T18:00:00Z"
+}
+
+###
+
+### Update an existing todo item
+PUT {{baseUrl}}/api/lists/{{listId}}/items/{{itemId}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Updated Task Title",
+  "description": "Updated task description",
+  "dueDate": "2024-12-31T23:59:59Z"
+}
+
+###
+
+### Update a todo item (remove description and due date)
+PUT {{baseUrl}}/api/lists/{{listId}}/items/{{itemId}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Simplified Task"
+}
+
+###
+
+### Delete a todo item
+DELETE {{baseUrl}}/api/lists/{{listId}}/items/{{itemId}}
+Accept: {{contentType}}
+
+###
+
+### Mark a todo item as completed
+PATCH {{baseUrl}}/api/lists/{{listId}}/items/{{itemId}}/complete?isCompleted=true
+Accept: {{contentType}}
+
+###
+
+### Mark a todo item as not completed
+PATCH {{baseUrl}}/api/lists/{{listId}}/items/{{itemId}}/complete?isCompleted=false
+Accept: {{contentType}}
+
+###
+
+###############################################
+# Error Examples (for testing validation)
+###############################################
+
+### Create list with invalid data (missing required field)
+POST {{baseUrl}}/api/List
+Content-Type: {{contentType}}
+
+{
+  "description": "This will fail because name is required"
+}
+
+###
+
+### Create list with invalid data (name too long)
+POST {{baseUrl}}/api/List
+Content-Type: {{contentType}}
+
+{
+  "name": "This is a very long name that exceeds the maximum length of 200 characters allowed for a todo list name. This should trigger a validation error because it is way too long and will not be accepted by the API validation system."
+}
+
+###
+
+### Create item with invalid data (missing required field)
+POST {{baseUrl}}/api/List/{{listId}}/items
+Content-Type: {{contentType}}
+
+{
+  "description": "This will fail because title is required"
+}
+
+###
+
+### Get list that doesn't exist (404 example)
+GET {{baseUrl}}/api/List/00000000-0000-0000-0000-000000000999
+Accept: {{contentType}}
+
+###
+
+### Get item that doesn't exist (404 example)
+GET {{baseUrl}}/api/lists/{{listId}}/items/00000000-0000-0000-0000-000000000999
+Accept: {{contentType}}
+
+###
+
+###############################################
+# Authentication Examples (for Task #20)
+###############################################
+
+### Register a new user (will be implemented in Task #20)
+# POST {{baseUrl}}/api/auth/register
+# Content-Type: {{contentType}}
+#
+# {
+#   "email": "user@example.com",
+#   "username": "testuser",
+#   "password": "SecurePassword123!"
+# }
+
+###
+
+### Login (will be implemented in Task #20)
+# POST {{baseUrl}}/api/auth/login
+# Content-Type: {{contentType}}
+#
+# {
+#   "email": "user@example.com",
+#   "password": "SecurePassword123!"
+# }
+
+###
+
+### Authenticated request example (will be implemented in Task #20)
+# GET {{baseUrl}}/api/List
+# Accept: {{contentType}}
+# Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 ###

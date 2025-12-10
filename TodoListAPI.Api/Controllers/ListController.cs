@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TodoListAPI.Api.Extensions;
 using TodoListAPI.Api.Models.Responses;
 using TodoListAPI.Core.DTOs;
 using TodoListAPI.Core.Models.Requests;
@@ -9,9 +11,11 @@ namespace TodoListAPI.Api.Controllers;
 /// <summary>
 /// Controller for managing TodoLists.
 /// Provides endpoints for CRUD operations on todo lists and their items.
+/// All endpoints require authentication via JWT token.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ListController : ControllerBase
 {
     private readonly IListService _listService;
@@ -37,9 +41,7 @@ public class ListController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<TodoListResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<TodoListResponse>>> GetListsForCurrentUser()
     {
-        // TODO (Task #20): Extract userId from JWT claims when authentication is implemented
-        // For now, use placeholder userId as specified in Backend-Todo-List.md Task #10
-        var userId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        var userId = User.GetUserIdRequired();
         
         var lists = await _listService.GetListsForUserAsync(userId);
         return Ok(lists.Select(MapToResponse));
@@ -79,9 +81,7 @@ public class ListController : ControllerBase
         // Validation is automatically handled by [ApiController] attribute
         // Invalid requests return ProblemDetails (RFC 7807) before this method is called
 
-        // TODO (Task #20): Extract userId from JWT claims when authentication is implemented
-        // For now, use placeholder userId as specified in Backend-Todo-List.md Task #10
-        var userId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        var userId = User.GetUserIdRequired();
         
         try
         {

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TodoListAPI.Api.Models.Responses;
 using TodoListAPI.Core.Models.Requests;
@@ -8,9 +9,11 @@ namespace TodoListAPI.Api.Controllers;
 /// <summary>
 /// Controller for managing TodoItems.
 /// Provides endpoints for CRUD operations on todo items.
+/// All endpoints require authentication via JWT token.
 /// </summary>
 [ApiController]
 [Route("api/lists/{listId:guid}/items")]
+[Authorize]
 public class ListItemController : ControllerBase
 {
     private readonly IListItemService _listItemService;

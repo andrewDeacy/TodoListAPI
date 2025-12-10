@@ -1,6 +1,9 @@
-using Microsoft.AspNetCore.Http;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using TodoListAPI.Api.Middleware;
 using TodoListAPI.Repository;
 using TodoListAPI.Repository.Models;
@@ -71,6 +74,31 @@ builder.Services.AddSwaggerGen(options =>
     {
         options.IncludeXmlComments(coreXmlPath);
     }
+
+    // Configure Swagger to support JWT Bearer authentication
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.\nExample: \"Bearer 12345abcdef\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 // Configure CORS for frontend integration
@@ -117,6 +145,37 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Configure JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var secretKey = jwtSettings["SecretKey"];
+
+if (string.IsNullOrEmpty(secretKey))
+{
+    throw new InvalidOperationException("JWT SecretKey is not configured in appsettings.json");
+}
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+    };
+});
+
+// Configure Authorization
+builder.Services.AddAuthorization();
+
 // Configure DbContext with SQLite (Scoped lifetime - one per HTTP request)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<TodoListDbContext>(options =>
@@ -125,10 +184,12 @@ builder.Services.AddDbContext<TodoListDbContext>(options =>
 // Register Repositories (Scoped - one per HTTP request)
 builder.Services.AddScoped<IListRepository, ListRepository>();
 builder.Services.AddScoped<IListItemRepository, ListItemRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Register Services (Scoped - one per HTTP request)
 builder.Services.AddScoped<IListService, ListService>();
 builder.Services.AddScoped<IListItemService, ListItemService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
@@ -172,6 +233,10 @@ app.UseHttpsRedirection();
 
 // Add CORS middleware (must be before UseAuthentication and MapControllers)
 app.UseCors("AllowFrontend");
+
+// Add Authentication and Authorization middleware (must be before MapControllers)
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Add global exception handling middleware (must be before MapControllers)
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
