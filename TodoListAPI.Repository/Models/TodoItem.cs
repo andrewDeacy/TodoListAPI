@@ -48,6 +48,13 @@ public class TodoItem
     public DateTime? DueDate { get; set; }
 
     /// <summary>
+    /// Order/position of the todo item within its list.
+    /// Used for custom ordering and reordering functionality.
+    /// Lower values appear first in the list.
+    /// </summary>
+    public int Order { get; set; }
+
+    /// <summary>
     /// Navigation property to the TodoList that contains this item.
     /// </summary>
     public TodoList TodoList { get; set; } = null!;

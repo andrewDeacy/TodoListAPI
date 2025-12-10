@@ -79,7 +79,11 @@ public class TodoListDbContext : DbContext
             entity.Property(e => e.IsCompleted).IsRequired();
             entity.Property(e => e.CreatedDate).IsRequired();
             entity.Property(e => e.UpdatedDate).IsRequired();
+            entity.Property(e => e.Order).IsRequired();
             // DueDate is optional (nullable), no configuration needed
+
+            // Create composite index on (ListId, Order) for efficient ordering queries
+            entity.HasIndex(e => new { e.ListId, e.Order });
 
             // Configure relationship with TodoList
             entity.HasOne(e => e.TodoList)
