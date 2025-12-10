@@ -45,6 +45,50 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure CORS for frontend integration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            // In development, allow common localhost ports for frontend frameworks
+            policy.WithOrigins(
+                "http://localhost:3000",  // React default
+                "http://localhost:5173",  // Vite default
+                "http://localhost:8080",  // Vue CLI default
+                "http://localhost:4200",  // Angular default
+                "http://localhost:5174",  // Vite alternate
+                "http://localhost:5175"   // Vite alternate
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+        }
+        else
+        {
+            // In production, use configured origins from appsettings.json
+            var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins")
+                .Get<string[]>() ?? Array.Empty<string>();
+            
+            if (allowedOrigins.Length > 0)
+            {
+                policy.WithOrigins(allowedOrigins)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            }
+            else
+            {
+                // Fallback: allow any origin (not recommended for production, but configurable)
+                policy.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            }
+        }
+    });
+});
+
 // Configure DbContext with SQLite (Scoped lifetime - one per HTTP request)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<TodoListDbContext>(options =>
@@ -97,6 +141,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add CORS middleware (must be before UseAuthentication and MapControllers)
+app.UseCors("AllowFrontend");
 
 // Add global exception handling middleware (must be before MapControllers)
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
