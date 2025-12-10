@@ -43,7 +43,35 @@ builder.Services.AddControllers()
 
 // Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Version = "v1",
+        Title = "TodoList API",
+        Description = "A RESTful API for managing todo lists and todo items. Built with .NET 8.0, EF Core, and SQLite.",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "TodoList API Support"
+        }
+    });
+
+    // Include XML comments in Swagger documentation
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+
+    // Include XML comments from Core project (for request/response models)
+    var coreXmlFile = "TodoListAPI.Core.xml";
+    var coreXmlPath = Path.Combine(AppContext.BaseDirectory, coreXmlFile);
+    if (File.Exists(coreXmlPath))
+    {
+        options.IncludeXmlComments(coreXmlPath);
+    }
+});
 
 // Configure CORS for frontend integration
 builder.Services.AddCors(options =>
