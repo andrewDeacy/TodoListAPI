@@ -22,7 +22,7 @@ dotnet --version
 ### 1. Clone and Navigate
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/andrewDeacy/TodoListAPI.git
 cd TodoListAPI
 ```
 
@@ -177,6 +177,10 @@ JWT settings can be configured in `appsettings.json`:
 ```
 
 For production, use a secure, randomly generated key (at least 32 characters).
+
+## Related Projects
+
+- [TodoListClient](https://github.com/andrewDeacy/TodoListClient) - React frontend application
 
 ---
 
