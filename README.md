@@ -151,10 +151,12 @@ Key decisions:
 ## Future Improvements
 
 If given more time:
-- Refresh tokens for seamless authentication
+- Refresh tokens for authentication
 - Password reset functionality
+- GitHub Actions for easy CI/CD deployment
+- Deploy to Azure App Service / Static Web App
 - Integration tests
-- Structured logging and monitoring
+- Logging and monitoring
 - Rate limiting
 - Pagination for large datasets
 - List sharing and collaboration features
