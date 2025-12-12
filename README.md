@@ -4,7 +4,7 @@ A RESTful API for managing todo lists and todo items. Built with .NET 8.0, Entit
 
 ## Requirements Overview
 
-[Placeholder: Insert Reqs.png mind map here]
+![Requirements Mind Map](Requirments%20Mind%20Map.png)
 
 ## Prerequisites
 
